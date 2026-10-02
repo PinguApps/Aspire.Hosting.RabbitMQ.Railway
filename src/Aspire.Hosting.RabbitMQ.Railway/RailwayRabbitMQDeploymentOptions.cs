@@ -46,6 +46,14 @@ public sealed class RailwayRabbitMQDeploymentOptions
         ArgumentException.ThrowIfNullOrWhiteSpace(ConfigurePermissions);
         ArgumentException.ThrowIfNullOrWhiteSpace(WritePermissions);
         ArgumentException.ThrowIfNullOrWhiteSpace(ReadPermissions);
+        foreach (string value in new[] { VirtualHost, ConfigurePermissions, WritePermissions, ReadPermissions })
+        {
+            if (value.Contains("PAPP_", StringComparison.Ordinal))
+            {
+                throw new ArgumentException("RabbitMQ virtual host and permission expressions cannot contain reserved PAPP_ definition markers.");
+            }
+        }
+
         if (VolumeMountPath != "/var/lib/rabbitmq")
         {
             throw new ArgumentException("RabbitMQ persistence must mount /var/lib/rabbitmq.", nameof(VolumeMountPath));

@@ -85,6 +85,25 @@ public sealed class RailwayRabbitMQContractTests
     }
 
     [Fact]
+    public void Definitions_RejectMarkerCollisionsInEveryConfigurableDefinitionField()
+    {
+        foreach (Action<RailwayRabbitMQDeploymentOptions> configure in new Action<RailwayRabbitMQDeploymentOptions>[]
+        {
+            options => options.VirtualHost = "PAPP_OPERATOR_USER",
+            options => options.ConfigurePermissions = "xPAPP_APPLICATION_USER",
+            options => options.ReadPermissions = "PAPP_OPERATOR_HASH",
+            options => options.WritePermissions = "PAPP_APPLICATION_HASH",
+        })
+        {
+            RailwayRabbitMQDeploymentOptions options = new();
+            configure(options);
+            Assert.Contains("PAPP_", Assert.Throws<ArgumentException>(options.Validate).Message, StringComparison.Ordinal);
+        }
+
+        Assert.Contains("*PAPP_*", RailwayRabbitMQCommands.Broker(new()), StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void ProxyCommand_OnlyForwardsManagementHttpAndRetainsAuthentication()
     {
         string command = RailwayRabbitMQCommands.Proxy();

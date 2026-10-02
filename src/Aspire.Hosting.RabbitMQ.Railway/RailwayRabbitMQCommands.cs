@@ -25,7 +25,7 @@ internal static class RailwayRabbitMQCommands
         string script = $$"""
             set -eu
             for username in "$PAPP_RABBITMQ_OPERATOR_USER" "$PAPP_RABBITMQ_APPLICATION_USER"; do
-              case "$username" in ''|guest|PAPP_*|*[!a-zA-Z0-9_.-]*) echo 'RabbitMQ usernames must be non-guest identifiers outside the reserved PAPP_ prefix.' >&2; exit 64;; esac
+              case "$username" in ''|guest|*PAPP_*|*[!a-zA-Z0-9_.-]*) echo 'RabbitMQ usernames must be non-guest identifiers without reserved PAPP_ definition markers.' >&2; exit 64;; esac
             done
             [ "$PAPP_RABBITMQ_OPERATOR_USER" != "$PAPP_RABBITMQ_APPLICATION_USER" ] || exit 64
             [ "${#PAPP_RABBITMQ_OPERATOR_PASSWORD}" -ge 32 ] || exit 64
