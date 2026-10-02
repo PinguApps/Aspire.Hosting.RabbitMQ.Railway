@@ -17,7 +17,7 @@ All three services reached Railway `SUCCESS` and remain running for inspection. 
 
 ## Completed checks
 
-- Standard local resource preservation, publishing contract, credential validation, DTO parity, pinned image defaults, proxy routing, and credential-gated project-token scope: seven offline tests and one live scope test passed.
+- Standard local resource preservation, publishing contract, credential validation, marker-collision rejection, local management URL, DTO parity, pinned image defaults, proxy routing, and credential-gated project-token scope: nine offline tests and one live scope test passed.
 - Clean pinned-source dependency build and NuGet-backed TypeScript SDK restore/typecheck succeeded. Both pipeline listings contained broker and dependent management proxy steps.
 - Real private AMQP connections resolved both private IPv4 and IPv6 addresses. A password containing URI punctuation and virtual host `site /integration` connected successfully through the redirected application connection string.
 - Publisher confirms, a durable `site.persistence` queue, and persistent messages worked. Message body survived a real broker redeployment and was consumed with a manual acknowledgement.
