@@ -46,13 +46,17 @@ if (builder.ExecutionContext.IsPublishMode)
             options.MemoryGB = 1;
             options.VCpus = 1;
         });
-    worker.PublishToRailway(target, options => options.Image = release.WorkerImage);
+    string workerImage = builder.Configuration["Release:WorkerImage"]
+        ?? throw new InvalidOperationException("Configure Release:WorkerImage with the selected release's immutable GHCR image digest.");
+    worker.PublishToRailway(target, options => options.Image = workerImage);
 }
 ```
 
 Run `aspire deploy`. The target requires a pre-created project and environment, an environment-scoped project token, and the matching shared `PINGUAPPS_SITE_KEY` allocation marker. The extension delegates ownership, drift detection, retained-image deployment, and recovery to the shared Railway publisher.
 
 Create Railway targets and deployment parameters only inside `IsPublishMode`. Ordinary broker/workload declarations stay outside so local development requires no production credentials. The TypeScript equivalent is `await (await builder.executionContext()).isPublishMode()`.
+
+Set `Release:WorkerImage` to the selected release's existing `ghcr.io/owner/image@sha256:...` reference. The shared publisher uses that immutable container image.
 
 Explicit existing service identities are required when adopting previously unmarked infrastructure. No resource or volume is automatically deleted.
 
