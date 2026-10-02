@@ -82,6 +82,7 @@ The management URL is available as `rabbit.GetRailwayRabbitMQManagementUrl()` af
 ## Repository verification
 
 ```powershell
+pwsh ./eng/Prepare-RailwayDependency.ps1
 dotnet test Aspire.Hosting.RabbitMQ.Railway.slnx -c Release
 pwsh ./eng/Test-AspireVersionPins.ps1
 pwsh ./eng/Validate-TypeScriptAppHostPackage.ps1
