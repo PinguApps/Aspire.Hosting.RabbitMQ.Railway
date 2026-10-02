@@ -27,10 +27,10 @@ internal static class RailwayRabbitMQCommands
             for username in "$PAPP_RABBITMQ_OPERATOR_USER" "$PAPP_RABBITMQ_APPLICATION_USER"; do
               case "$username" in ''|guest|*PAPP_*|*[!a-zA-Z0-9_.-]*) echo 'RabbitMQ usernames must be non-guest identifiers without reserved PAPP_ definition markers.' >&2; exit 64;; esac
             done
-            [ "$PAPP_RABBITMQ_OPERATOR_USER" != "$PAPP_RABBITMQ_APPLICATION_USER" ] || exit 64
-            [ "${#PAPP_RABBITMQ_OPERATOR_PASSWORD}" -ge 32 ] || exit 64
-            [ "${#PAPP_RABBITMQ_APPLICATION_PASSWORD}" -ge 32 ] || exit 64
-            [ "$PAPP_RABBITMQ_OPERATOR_PASSWORD" != "$PAPP_RABBITMQ_APPLICATION_PASSWORD" ] || exit 64
+            [ "$PAPP_RABBITMQ_OPERATOR_USER" != "$PAPP_RABBITMQ_APPLICATION_USER" ] || { echo 'RabbitMQ operator and application usernames must differ.' >&2; exit 64; }
+            [ "${#PAPP_RABBITMQ_OPERATOR_PASSWORD}" -ge 32 ] || { echo 'RabbitMQ operator password must contain at least 32 characters.' >&2; exit 64; }
+            [ "${#PAPP_RABBITMQ_APPLICATION_PASSWORD}" -ge 32 ] || { echo 'RabbitMQ application password must contain at least 32 characters.' >&2; exit 64; }
+            [ "$PAPP_RABBITMQ_OPERATOR_PASSWORD" != "$PAPP_RABBITMQ_APPLICATION_PASSWORD" ] || { echo 'RabbitMQ operator and application passwords must differ.' >&2; exit 64; }
             operator_hash=$(rabbitmqctl -q hash_password "$PAPP_RABBITMQ_OPERATOR_PASSWORD")
             application_hash=$(rabbitmqctl -q hash_password "$PAPP_RABBITMQ_APPLICATION_PASSWORD")
             printf '%s' '{{encodedDefinitions}}' | base64 -d | sed -e "s/PAPP_OPERATOR_USER/$PAPP_RABBITMQ_OPERATOR_USER/g" -e "s/PAPP_APPLICATION_USER/$PAPP_RABBITMQ_APPLICATION_USER/g" -e "s@PAPP_OPERATOR_HASH@$operator_hash@g" -e "s@PAPP_APPLICATION_HASH@$application_hash@g" > /etc/rabbitmq/definitions.json
