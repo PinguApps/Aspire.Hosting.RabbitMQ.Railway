@@ -77,7 +77,7 @@ Run `aspire restore` to generate bindings. The callback-free exported `publishTo
 ## Security and persistence
 
 - AMQP port 5672 and broker management port 15672 are private Railway networking destinations. Only Nginx port 8080 gets public HTTPS.
-- RabbitMQ authenticates management UI/API requests. The proxy adds no separate identity provider. Its `/health` route reveals no broker state.
+- RabbitMQ authenticates management UI/API requests. The proxy adds no separate identity provider. Its `/health` route is an unauthenticated readiness check that relays the broker login page.
 - Operator and application usernames must be distinct, non-`guest` identifiers using letters, digits, dots, hyphens, or underscores. Usernames, virtual host, and permission expressions cannot contain reserved `PAPP_` definition markers.
 - Passwords must be distinct secret parameters, at least 32 characters. Generate independent random passwords and persist them in your deployment secret store; redeployment must reuse them.
 - The operator has RabbitMQ administrator permissions. Application credentials have no management tags and default permissions only for `site.*` resources and the default exchange. Override permission expressions for your declared topology.
