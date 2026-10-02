@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.RabbitMQ" />
+    <ProjectReference Include="..\..\src\Aspire.Hosting.RabbitMQ.Railway\Aspire.Hosting.RabbitMQ.Railway.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\samples\AppHostSnippets\RailwayRabbitMQAppHostSnippets.cs" Link="Samples\RailwayRabbitMQAppHostSnippets.cs" />
+  </ItemGroup>
+</Project>
