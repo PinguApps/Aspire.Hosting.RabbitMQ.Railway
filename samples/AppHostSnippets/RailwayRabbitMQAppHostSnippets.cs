@@ -9,16 +9,26 @@ internal static class RailwayRabbitMQAppHostSnippets
 {
     internal static IResourceBuilder<RabbitMQServerResource> Configure(IDistributedApplicationBuilder builder)
     {
-        IResourceBuilder<RailwayTargetResource> target = builder.AddRailwayTarget(
-            "railway",
-            builder.AddParameter("railway-project-id"),
-            builder.AddParameter("railway-environment-id"),
-            builder.AddParameter("railway-api-token", secret: true),
-            builder.AddParameter("site-key"));
-        return builder.AddRabbitMQ("rabbitmq",
-                builder.AddParameter("rabbitmq-application-user"),
-                builder.AddParameter("rabbitmq-application-password", secret: true))
-            .PublishToRailway(target,
+        IResourceBuilder<ParameterResource>? applicationUser = null;
+        IResourceBuilder<ParameterResource>? applicationPassword = null;
+        if (builder.ExecutionContext.IsPublishMode)
+        {
+            applicationUser = builder.AddParameter("rabbitmq-application-user");
+            applicationPassword = builder.AddParameter("rabbitmq-application-password", secret: true);
+        }
+
+        IResourceBuilder<RabbitMQServerResource> rabbit = builder.AddRabbitMQ("rabbitmq", applicationUser, applicationPassword)
+            .WithManagementPlugin();
+
+        if (builder.ExecutionContext.IsPublishMode)
+        {
+            IResourceBuilder<RailwayTargetResource> target = builder.AddRailwayTarget(
+                "railway",
+                builder.AddParameter("railway-project-id"),
+                builder.AddParameter("railway-environment-id"),
+                builder.AddParameter("railway-api-token", secret: true),
+                builder.AddParameter("site-key"));
+            rabbit.PublishToRailway(target,
                 builder.AddParameter("rabbitmq-operator-user"),
                 builder.AddParameter("rabbitmq-operator-password", secret: true),
                 options =>
@@ -27,5 +37,8 @@ internal static class RailwayRabbitMQAppHostSnippets
                     options.MemoryGB = 1;
                     options.VCpus = 1;
                 });
+        }
+
+        return rabbit;
     }
 }

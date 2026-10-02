@@ -16,17 +16,28 @@ The package depends on `PinguApps.Aspire.Hosting.Railway` 1.0.0. Use .NET 10 and
 ```csharp
 using Aspire.Hosting.RabbitMQ.Railway;
 using Aspire.Hosting.Railway;
+using Aspire.Hosting.ApplicationModel;
 
-var target = builder.AddRailwayTarget("railway",
-    builder.AddParameter("railway-project-id"),
-    builder.AddParameter("railway-environment-id"),
-    builder.AddParameter("railway-api-token", secret: true),
-    builder.AddParameter("site-key"));
+IResourceBuilder<ParameterResource>? applicationUser = null;
+IResourceBuilder<ParameterResource>? applicationPassword = null;
+if (builder.ExecutionContext.IsPublishMode)
+{
+    applicationUser = builder.AddParameter("rabbitmq-application-user");
+    applicationPassword = builder.AddParameter("rabbitmq-application-password", secret: true);
+}
 
-var rabbit = builder.AddRabbitMQ("rabbitmq",
-        builder.AddParameter("rabbitmq-application-user"),
-        builder.AddParameter("rabbitmq-application-password", secret: true))
-    .PublishToRailway(target,
+var rabbit = builder.AddRabbitMQ("rabbitmq", applicationUser, applicationPassword)
+    .WithManagementPlugin();
+var worker = builder.AddProject<Projects.Worker>("worker").WithReference(rabbit);
+
+if (builder.ExecutionContext.IsPublishMode)
+{
+    var target = builder.AddRailwayTarget("railway",
+        builder.AddParameter("railway-project-id"),
+        builder.AddParameter("railway-environment-id"),
+        builder.AddParameter("railway-api-token", secret: true),
+        builder.AddParameter("site-key"));
+    rabbit.PublishToRailway(target,
         builder.AddParameter("rabbitmq-operator-user"),
         builder.AddParameter("rabbitmq-operator-password", secret: true),
         options =>
@@ -35,13 +46,13 @@ var rabbit = builder.AddRabbitMQ("rabbitmq",
             options.MemoryGB = 1;
             options.VCpus = 1;
         });
-
-builder.AddProject<Projects.Worker>("worker")
-    .WithReference(rabbit)
-    .PublishToRailway(target, options => options.Image = release.WorkerImage);
+    worker.PublishToRailway(target, options => options.Image = release.WorkerImage);
+}
 ```
 
 Run `aspire deploy`. The target requires a pre-created project and environment, an environment-scoped project token, and the matching shared `PINGUAPPS_SITE_KEY` allocation marker. The extension delegates ownership, drift detection, retained-image deployment, and recovery to the shared Railway publisher.
+
+Create Railway targets and deployment parameters only inside `IsPublishMode`. Ordinary broker/workload declarations stay outside so local development requires no production credentials. The TypeScript equivalent is `await (await builder.executionContext()).isPublishMode()`.
 
 Explicit existing service identities are required when adopting previously unmarked infrastructure. No resource or volume is automatically deleted.
 
