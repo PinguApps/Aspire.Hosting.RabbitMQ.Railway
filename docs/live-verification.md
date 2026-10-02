@@ -4,6 +4,8 @@ Dedicated project: `PIN-646 RabbitMQ Integration` (`3baaaee7-2fe4-43f1-868e-a3c3
 
 Verified on 2 October 2026 using external temporary C# AppHosts restored from packed NuGet packages, then real `aspire deploy` with Aspire CLI 13.6.0. Credentials and generated deployment state remain outside this repository.
 
+The final replay used the pinned shared Railway source commit `5547a196c626ad018db8d651ac2bbca34314b8d5`. The loaded provider assembly matched the freshly restored NuGet assembly. All three services reused their exact deployment IDs and the retained volume; private AMQP, persistence, permissions, and HTTPS management authentication passed again.
+
 ## Retained pilot
 
 | Resource | Identity | Inspection |
