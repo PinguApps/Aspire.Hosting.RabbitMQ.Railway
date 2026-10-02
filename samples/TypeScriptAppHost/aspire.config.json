@@ -1,0 +1,25 @@
+{
+  "channel": "stable",
+  "sdk": {
+    "version": "13.6.0"
+  },
+  "appHost": {
+    "language": "typescript/nodejs",
+    "path": "apphost.mts"
+  },
+  "packages": {
+    "Aspire.Hosting.RabbitMQ": "13.6.0",
+    "PinguApps.Aspire.Hosting.RabbitMQ.Railway": "1.0.0",
+    "PinguApps.Aspire.Hosting.Railway": "1.0.0"
+  },
+  "Parameters": {
+    "site-key": "fixture-site",
+    "rabbitmq-operator-password": "fixture-operator-password-not-a-real-secret",
+    "railway-api-token": "fixture-token",
+    "railway-project-id": "fixture-project",
+    "rabbitmq-application-user": "site-app",
+    "railway-environment-id": "fixture-environment",
+    "rabbitmq-application-password": "fixture-application-password-not-a-real-secret",
+    "rabbitmq-operator-user": "site-operator"
+  }
+}
