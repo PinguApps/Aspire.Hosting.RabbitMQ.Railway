@@ -23,6 +23,20 @@ public sealed class RailwayRabbitMQContractTests
     }
 
     [Fact]
+    public void ManagementUrl_LocalRunUsesConfiguredEndpointAndExplainsMissingConfiguration()
+    {
+        IDistributedApplicationBuilder app = DistributedApplication.CreateBuilder();
+        IResourceBuilder<RabbitMQServerResource> rabbit = CreateBroker(app);
+        Assert.Contains("WithManagementPlugin", Assert.Throws<InvalidOperationException>(() => rabbit.GetRailwayRabbitMQManagementUrl()).Message, StringComparison.Ordinal);
+        rabbit.WithManagementPlugin();
+        Publish(app, rabbit);
+        Assert.Contains("management", rabbit.GetRailwayRabbitMQManagementUrl().ValueExpression, StringComparison.Ordinal);
+
+        IDistributedApplicationBuilder publishingApp = CreatePublishingBuilder();
+        Assert.Contains("PublishToRailway", Assert.Throws<InvalidOperationException>(() => CreateBroker(publishingApp).GetRailwayRabbitMQManagementUrl()).Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void Publish_KeepsResourceOfRecordAndAddsOnlyManagementProxy()
     {
         IDistributedApplicationBuilder app = CreatePublishingBuilder();

@@ -11,6 +11,7 @@ const password = await builder.addParameter("rabbitmq-application-password", { s
 const operator = await builder.addParameter("rabbitmq-operator-user");
 const operatorPassword = await builder.addParameter("rabbitmq-operator-password", { secret: true });
 let broker = await builder.addRabbitMQ("rabbitmq", { userName: user, password });
+broker = await broker.withManagementPlugin();
 broker = await broker.publishToRailway(target, operator, operatorPassword, {
   serviceName: "site-rabbitmq",
   proxyServiceName: "site-rabbitmq-management",
@@ -23,5 +24,7 @@ broker = await broker.publishToRailway(target, operator, operatorPassword, {
   readPermissions: "^site\\.",
 });
 void broker;
+const managementUrl = await broker.getRailwayRabbitMQManagementUrl();
+void managementUrl;
 const app = await builder.build();
 await app.run();
