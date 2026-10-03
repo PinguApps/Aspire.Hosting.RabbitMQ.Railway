@@ -1,5 +1,7 @@
 # PinguApps.Aspire.Hosting.RabbitMQ.Railway
 
+[![PinguApps.Aspire.Hosting.RabbitMQ.Railway version](https://img.shields.io/nuget/v/PinguApps.Aspire.Hosting.RabbitMQ.Railway?style=for-the-badge&label=PinguApps.Aspire.Hosting.RabbitMQ.Railway)](https://www.nuget.org/packages/PinguApps.Aspire.Hosting.RabbitMQ.Railway/) [![PinguApps.Aspire.Hosting.RabbitMQ.Railway downloads](https://img.shields.io/nuget/dt/PinguApps.Aspire.Hosting.RabbitMQ.Railway?style=for-the-badge&label=downloads)](https://www.nuget.org/packages/PinguApps.Aspire.Hosting.RabbitMQ.Railway/)
+
 Publish standard Aspire RabbitMQ resources to a site-owned Railway environment. Local development continues to use the standard RabbitMQ container. Deployment creates one persistent private broker and one public HTTPS management proxy.
 
 ## Install
