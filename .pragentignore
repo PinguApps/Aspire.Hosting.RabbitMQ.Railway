@@ -1,0 +1,3 @@
+# PR Agent review exclusions use Git ignore syntax and do not affect Git tracking.
+# No exclusions are currently justified; keep all tracked files reviewable.
+# Use $pragent-ignore before adding narrow rules for confirmed tool-owned output.
