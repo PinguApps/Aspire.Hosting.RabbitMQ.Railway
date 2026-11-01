@@ -7,11 +7,11 @@ Publish standard Aspire RabbitMQ resources to a site-owned Railway environment. 
 ## Install
 
 ```powershell
-dotnet add package Aspire.Hosting.RabbitMQ --version 13.6.0
+dotnet add package Aspire.Hosting.RabbitMQ --version 13.6.4
 dotnet add package PinguApps.Aspire.Hosting.RabbitMQ.Railway --version 1.0.0
 ```
 
-The package depends on `PinguApps.Aspire.Hosting.Railway` 1.0.0. Use .NET 10 and Aspire CLI 13.6.0.
+The package depends on `PinguApps.Aspire.Hosting.Railway` 1.0.0. Use .NET 10 and Aspire CLI 13.6.4.
 
 ## C# AppHost
 
@@ -67,7 +67,7 @@ Explicit existing service identities are required when adopting previously unmar
 ```json
 {
   "packages": {
-    "Aspire.Hosting.RabbitMQ": "13.6.0",
+    "Aspire.Hosting.RabbitMQ": "13.6.4",
     "PinguApps.Aspire.Hosting.Railway": "1.0.0",
     "PinguApps.Aspire.Hosting.RabbitMQ.Railway": "1.0.0"
   }

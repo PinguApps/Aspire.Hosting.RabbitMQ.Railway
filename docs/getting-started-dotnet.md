@@ -1,6 +1,6 @@
 # C# AppHost
 
-Install `PinguApps.Aspire.Hosting.RabbitMQ.Railway` 1.0.0 in a .NET 10 AppHost using Aspire 13.6.0. The package includes the standard RabbitMQ integration and shared Railway publisher.
+Install `PinguApps.Aspire.Hosting.RabbitMQ.Railway` 1.0.0 in a .NET 10 AppHost using Aspire 13.6.4. The package includes the standard RabbitMQ integration and shared Railway publisher.
 
 Create a Railway target from recorded project/environment/site identifiers and an environment-scoped project token. Pass explicit application username/password parameters to `AddRabbitMQ`, then call `PublishToRailway(target, operatorUser, operatorPassword, configure)`.
 
