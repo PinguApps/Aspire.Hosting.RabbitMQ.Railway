@@ -1,14 +1,14 @@
 {
   "channel": "stable",
   "sdk": {
-    "version": "13.6.0"
+    "version": "13.6.4"
   },
   "appHost": {
     "language": "typescript/nodejs",
     "path": "apphost.mts"
   },
   "packages": {
-    "Aspire.Hosting.RabbitMQ": "13.6.0",
+    "Aspire.Hosting.RabbitMQ": "13.6.4",
     "PinguApps.Aspire.Hosting.RabbitMQ.Railway": "../../../../src/Aspire.Hosting.RabbitMQ.Railway/Aspire.Hosting.RabbitMQ.Railway.csproj",
     "PinguApps.Aspire.Hosting.Railway": "1.0.0"
   },
