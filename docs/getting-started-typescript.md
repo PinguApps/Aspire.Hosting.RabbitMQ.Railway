@@ -1,6 +1,6 @@
 # TypeScript AppHost
 
-List `Aspire.Hosting.RabbitMQ` 13.6.4, `PinguApps.Aspire.Hosting.Railway` 1.0.0, and `PinguApps.Aspire.Hosting.RabbitMQ.Railway` 1.0.0 explicitly in `aspire.config.json`, then run `aspire restore`. The shared target's generated exports require the explicit core package entry.
+List `Aspire.Hosting.RabbitMQ` 13.6.5, `PinguApps.Aspire.Hosting.Railway` 1.0.0, and `PinguApps.Aspire.Hosting.RabbitMQ.Railway` 1.0.0 explicitly in `aspire.config.json`, then run `aspire restore`. The shared target's generated exports require the explicit core package entry.
 
 The generated builder exposes `publishToRailway(target, operatorUser, operatorPassword, options)`. The DTO supports the same settings as the C# callback. No callbacks cross the guest-language boundary.
 

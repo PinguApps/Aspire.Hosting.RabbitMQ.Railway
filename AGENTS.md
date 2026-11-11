@@ -62,7 +62,7 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 - Standard `RabbitMQServerResource` is the resource of record; local run behavior remains standard Aspire.
 - Railway publication is opt-in. The shared Railway package owns authentication, destination ownership, reconciliation, and deployment transport.
 - Target framework: `.NET 10`.
-- Target Aspire version: `13.6.4`.
+- Target Aspire version: `13.6.5`.
 - Broker AMQP stays private. Only the management HTTPS proxy receives a public route.
 - Operator credentials and application credentials are distinct secret parameters; application users have no management tags.
 - Persist `/var/lib/rabbitmq` and a stable node name. Never automatically delete brokers or volumes.
