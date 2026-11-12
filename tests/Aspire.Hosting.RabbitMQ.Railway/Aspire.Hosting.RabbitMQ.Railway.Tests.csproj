@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <IsTestProject>true</IsTestProject>
+    <UseAppHost>true</UseAppHost>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.RabbitMQ" />
