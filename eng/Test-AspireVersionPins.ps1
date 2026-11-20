@@ -65,6 +65,9 @@ foreach ($path in $typeScriptConfigPaths) {
   $config = Get-Content -Raw -Path (Join-Path $repoRoot $path) | ConvertFrom-Json
   Add-Pin -Path $path -Name "sdk.version" -Version $config.sdk.version
   Add-Pin -Path $path -Name "packages.Aspire.Hosting.RabbitMQ" -Version $config.packages."Aspire.Hosting.RabbitMQ"
+  if ($config.packages."PinguApps.Aspire.Hosting.Railway" -ne $packageVersions["PinguApps.Aspire.Hosting.Railway"]) {
+    throw "Railway core pin drift in $path."
+  }
 }
 
 $workflowPaths = @(
@@ -79,6 +82,11 @@ foreach ($path in $workflowPaths) {
 
 Add-RegexPin -Path "README.md" -Name "Aspire.Hosting.RabbitMQ sample" -Pattern '"Aspire\.Hosting\.RabbitMQ"\s*:\s*"(?<version>[^"]+)"'
 Add-RegexPin -Path "docs/install.md" -Name "Aspire.Hosting.RabbitMQ install samples" -Pattern '"Aspire\.Hosting\.RabbitMQ"\s*:\s*"(?<version>[^"]+)"'
+Add-RegexPin -Path "README.md" -Name "Aspire.Hosting.RabbitMQ install command" -Pattern 'dotnet add package Aspire\.Hosting\.RabbitMQ --version (?<version>\S+)'
+Add-RegexPin -Path "docs/getting-started-typescript.md" -Name "Aspire.Hosting.RabbitMQ requirement" -Pattern '`Aspire\.Hosting\.RabbitMQ` (?<version>\d+\.\d+\.\d+)'
+foreach ($path in "README.md", "docs/install.md", "docs/getting-started-dotnet.md") {
+  Add-RegexPin -Path $path -Name "Documented Aspire version" -Pattern 'Aspire (?:CLI )?(?<version>\d+\.\d+\.\d+)(?=[ .,/]|$)'
+}
 Add-RegexPin -Path "AGENTS.md" -Name "Target Aspire version" -Pattern 'Target Aspire version:\s*`(?<version>[^`]+)`'
 
 $driftedPins = $pins | Where-Object { $_.Version -ne $baseline }

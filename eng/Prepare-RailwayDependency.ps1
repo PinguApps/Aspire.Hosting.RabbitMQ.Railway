@@ -1,5 +1,5 @@
 param(
-    [string] $CoreCommit = "983bb38fb2c896c3282eefd66303f36903c2b0aa",
+    [string] $CoreCommit = "fd9239adad9a5a10b1489194f59aa14311ca625d",
     [string] $Configuration = "Release"
 )
 
@@ -11,6 +11,9 @@ if ($CoreCommit -notmatch '^[a-f0-9]{40}$') {
 }
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
+[xml] $props = Get-Content -Raw (Join-Path $repoRoot "Directory.Packages.props")
+$coreVersion = ($props.Project.ItemGroup.PackageVersion | Where-Object Include -eq "PinguApps.Aspire.Hosting.Railway").Version
+if ($coreVersion -notmatch '^\d+\.\d+\.\d+$') { throw "The core dependency must have an exact stable version." }
 $artifactsRoot = [IO.Path]::GetFullPath((Join-Path $repoRoot "artifacts"))
 $dependencyRoot = [IO.Path]::GetFullPath((Join-Path $artifactsRoot "railway-dependency-source"))
 $packageFeed = [IO.Path]::GetFullPath((Join-Path $artifactsRoot "railway-dependencies"))
@@ -35,11 +38,9 @@ if ($LASTEXITCODE -ne 0) { throw "Pinned Railway checkout failed." }
 $checkedOut = (git -C $dependencyRoot rev-parse HEAD).Trim()
 if ($LASTEXITCODE -ne 0 -or $checkedOut -ne $CoreCommit) { throw "Railway source identity mismatch." }
 
-# Keep the pinned source on this consumer's reviewed dependency versions, including security fixes.
-$packageVersions = Join-Path $repoRoot "Directory.Packages.props"
-dotnet pack (Join-Path $dependencyRoot "src/Aspire.Hosting.Railway/Aspire.Hosting.Railway.csproj") -c $Configuration -p:Version=1.0.0 "-p:DirectoryPackagesPropsPath=$packageVersions" -o $packageFeed | Write-Host
+dotnet pack (Join-Path $dependencyRoot "src/Aspire.Hosting.Railway/Aspire.Hosting.Railway.csproj") -c $Configuration "-p:Version=$coreVersion" -o $packageFeed | Write-Host
 if ($LASTEXITCODE -ne 0) { throw "Pinned Railway source packaging failed." }
-if (-not (Test-Path -LiteralPath (Join-Path $packageFeed "PinguApps.Aspire.Hosting.Railway.1.0.0.nupkg"))) {
+if (-not (Test-Path -LiteralPath (Join-Path $packageFeed "PinguApps.Aspire.Hosting.Railway.$coreVersion.nupkg"))) {
     throw "Railway dependency package was not produced."
 }
 
