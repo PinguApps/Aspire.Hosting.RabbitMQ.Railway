@@ -13,7 +13,8 @@
         "dotnet tool install -g Aspire\\.Cli --version (?<currentValue>\\S+)"
       ],
       "datasourceTemplate": "nuget",
-      "depNameTemplate": "Aspire.Cli"
+      "depNameTemplate": "Aspire.Cli",
+      "versioningTemplate": "semver"
     },
     {
       "customType": "regex",
@@ -24,18 +25,22 @@
         "\"sdk\"\\s*:\\s*\\{\\s*\"version\"\\s*:\\s*\"(?<currentValue>[^\"]+)\""
       ],
       "datasourceTemplate": "nuget",
-      "depNameTemplate": "Aspire.Cli"
+      "depNameTemplate": "Aspire.Cli",
+      "versioningTemplate": "semver"
     },
     {
       "customType": "regex",
       "managerFilePatterns": [
-        "/(^|/)(README\\.md|docs/install\\.md|samples/TypeScriptAppHost/aspire\\.config\\.json|tests/Aspire\\.Hosting\\.RabbitMQ\\.Railway/Fixtures/TypeScriptAppHost/aspire\\.config\\.json)$/"
+        "/(^|/)(README\\.md|docs/install\\.md|samples/TypeScriptAppHost/aspire\\.config\\.json|tests/Aspire\\.Hosting\\.RabbitMQ\\.Railway/Fixtures/TypeScriptAppHost/aspire\\.config\\.json)$/",
+        "/^docs/getting-started-typescript\\.md$/"
       ],
       "matchStrings": [
-        "\"Aspire\\.Hosting\\.RabbitMQ\"\\s*:\\s*\"(?<currentValue>[^\"]+)\""
+        "\"Aspire\\.Hosting\\.RabbitMQ\"\\s*:\\s*\"(?<currentValue>[^\"]+)\"",
+        "(?:dotnet add package Aspire\\.Hosting\\.RabbitMQ --version |`Aspire\\.Hosting\\.RabbitMQ` )(?<currentValue>\\d+\\.\\d+\\.\\d+)"
       ],
       "datasourceTemplate": "nuget",
-      "depNameTemplate": "Aspire.Hosting.RabbitMQ"
+      "depNameTemplate": "Aspire.Hosting.RabbitMQ",
+      "versioningTemplate": "semver"
     },
     {
       "customType": "regex",
@@ -46,7 +51,36 @@
         "Target Aspire version:\\s*`(?<currentValue>[^`]+)`"
       ],
       "datasourceTemplate": "nuget",
-      "depNameTemplate": "Aspire.Hosting"
+      "depNameTemplate": "Aspire.Hosting",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^README\\.md$/",
+        "/^docs/(?:install|getting-started-dotnet|getting-started-typescript)\\.md$/"
+      ],
+      "matchStrings": [
+        "Aspire (?:CLI )?(?<currentValue>\\d+\\.\\d+\\.\\d+)(?:[ .,/]|$)"
+      ],
+      "datasourceTemplate": "nuget",
+      "depNameTemplate": "Aspire.Hosting",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^README\\.md$/",
+        "/^docs/(?:install|getting-started-dotnet|getting-started-typescript)\\.md$/",
+        "/(^|/)(samples/TypeScriptAppHost|tests/Aspire\\.Hosting\\.RabbitMQ\\.Railway/Fixtures/TypeScriptAppHost)/aspire\\.config\\.json$/"
+      ],
+      "matchStrings": [
+        "\"PinguApps\\.Aspire\\.Hosting\\.Railway\"\\s*:\\s*\"(?<currentValue>[^\"]+)\"",
+        "`PinguApps\\.Aspire\\.Hosting\\.Railway` (?<currentValue>\\d+\\.\\d+\\.\\d+)"
+      ],
+      "datasourceTemplate": "nuget",
+      "depNameTemplate": "PinguApps.Aspire.Hosting.Railway",
+      "versioningTemplate": "semver"
     }
   ],
   "packageRules": [

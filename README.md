@@ -7,11 +7,11 @@ Publish standard Aspire RabbitMQ resources to a site-owned Railway environment. 
 ## Install
 
 ```powershell
-dotnet add package Aspire.Hosting.RabbitMQ --version 13.6.5
-dotnet add package PinguApps.Aspire.Hosting.RabbitMQ.Railway --version 1.0.0
+dotnet add package Aspire.Hosting.RabbitMQ --version 17.0.0
+dotnet add package PinguApps.Aspire.Hosting.RabbitMQ.Railway --version 1.0.5
 ```
 
-The package depends on `PinguApps.Aspire.Hosting.Railway` 1.0.0. Use .NET 10 and Aspire CLI 13.6.5.
+The package depends on `PinguApps.Aspire.Hosting.Railway` 1.1.5. Use .NET 10 and Aspire CLI 17.0.0.
 
 ## C# AppHost
 
@@ -67,9 +67,9 @@ Explicit existing service identities are required when adopting previously unmar
 ```json
 {
   "packages": {
-    "Aspire.Hosting.RabbitMQ": "13.6.5",
-    "PinguApps.Aspire.Hosting.Railway": "1.0.0",
-    "PinguApps.Aspire.Hosting.RabbitMQ.Railway": "1.0.0"
+    "Aspire.Hosting.RabbitMQ": "17.0.0",
+    "PinguApps.Aspire.Hosting.Railway": "1.1.5",
+    "PinguApps.Aspire.Hosting.RabbitMQ.Railway": "1.0.5"
   }
 }
 ```
@@ -92,18 +92,19 @@ Run `aspire restore` to generate bindings. The callback-free exported `publishTo
 
 `Image` and `ProxyImage` are immutable digest references. `ServiceName`, `ProxyServiceName`, `Region`, `MemoryGB`, `VCpus`, `VirtualHost`, configure/write/read permission expressions, management custom domain, ownership mode, and explicit broker/proxy adoption identities are configurable. The persistent mount must remain `/var/lib/rabbitmq`.
 
-`WithReference(rabbit)` uses application credentials and the private broker endpoint during publishing. A configured virtual host is URL-encoded in the deployed connection URI. Standard local RabbitMQ uses its default virtual host.
+`WithReference(rabbit)` uses application credentials and the private broker endpoint during publishing. A configured virtual host is URL-encoded in the deployed connection URI. Standard local RabbitMQ uses its default virtual host and Aspire 17 defaults to RabbitMQ 4.4. Railway deployment uses the digest-pinned RabbitMQ 4.3 broker and management proxy independently of the local image.
 
 The management URL is available as `rabbit.GetRailwayRabbitMQManagementUrl()` after deployment; it contains no credentials. Core Railway outputs expose broker identities and its private hostname. Username/password values and management tokens must never appear in checked-in handoff evidence.
 
 ## Repository verification
 
 ```powershell
-pwsh ./eng/Prepare-RailwayDependency.ps1
 dotnet test Aspire.Hosting.RabbitMQ.Railway.slnx -c Release
 pwsh ./eng/Test-AspireVersionPins.ps1
 pwsh ./eng/Validate-TypeScriptAppHostPackage.ps1
 ```
+
+CI and release validation restore core Railway from NuGet.org. For an unpublished core change, run `eng/Prepare-RailwayDependency.ps1` and pass its feed explicitly with `-RailwayDependencyFeed`.
 
 The live pilot uses an external temporary consumer restored from packed NuGet packages. See [the live handoff](docs/live-verification.md) for deployed resource identities, tests, and recovery observations.
 

@@ -1,7 +1,8 @@
 param(
     [string] $Configuration = "Release",
     [string] $PackageVersion = "9999.0.0",
-    [string] $RailwayDependencyFeed = $env:RAILWAY_DEPENDENCY_FEED
+    [string] $RailwayDependencyFeed = $env:RAILWAY_DEPENDENCY_FEED,
+    [switch] $RequirePublishedDependency
 )
 
 $ErrorActionPreference = "Stop"
@@ -30,28 +31,32 @@ $fixtureWork = Join-Path $artifactsRoot "fixture"
 $nugetPackages = Join-Path $artifactsRoot ".nuget-packages"
 $packageId = "PinguApps.Aspire.Hosting.RabbitMQ.Railway"
 
-if ([string]::IsNullOrWhiteSpace($RailwayDependencyFeed)) {
-    $RailwayDependencyFeed = & (Join-Path $PSScriptRoot "Prepare-RailwayDependency.ps1") -Configuration $Configuration
+if ($RequirePublishedDependency -and -not [string]::IsNullOrWhiteSpace($RailwayDependencyFeed)) {
+    throw "Release validation must use the published Railway provider."
+}
+$coreSource = ""
+$coreMapping = ""
+if (-not [string]::IsNullOrWhiteSpace($RailwayDependencyFeed)) {
+    $feed = [Security.SecurityElement]::Escape((Resolve-Path $RailwayDependencyFeed).Path)
+    $coreSource = '<add key="core-fixture" value="' + $feed + '" />'
+    $coreMapping = '<packageSource key="core-fixture"><package pattern="PinguApps.Aspire.Hosting.Railway" /></packageSource>'
 }
 
 Remove-ContainedDirectory -Path $artifactsRoot -Root (Join-Path $repoRoot "artifacts")
 New-Item $packageOutput -ItemType Directory -Force | Out-Null
 New-Item $nugetPackages -ItemType Directory -Force | Out-Null
 
-$restoreArguments = @("restore", $solutionPath)
-if (-not [string]::IsNullOrWhiteSpace($RailwayDependencyFeed)) {
-    $restoreConfig = Join-Path $artifactsRoot "restore.NuGet.Config"
-    $escapedFeed = [Security.SecurityElement]::Escape([IO.Path]::GetFullPath($RailwayDependencyFeed))
-    @"
-<?xml version="1.0" encoding="utf-8"?>
-<configuration><packageSources><clear /><add key="railway-reviewed-source" value="$escapedFeed" /><add key="nuget.org" value="https://api.nuget.org/v3/index.json" /></packageSources></configuration>
+$restoreConfig = Join-Path $artifactsRoot "restore.NuGet.Config"
+@"
+<configuration>
+  <packageSources><clear />$coreSource<add key="nuget.org" value="https://api.nuget.org/v3/index.json" /></packageSources>
+  <packageSourceMapping>$coreMapping<packageSource key="nuget.org"><package pattern="*" /></packageSource></packageSourceMapping>
+</configuration>
 "@ | Set-Content -LiteralPath $restoreConfig -Encoding UTF8
-    $restoreArguments += @("--configfile", $restoreConfig)
-}
 $previousBuildPackages = $env:NUGET_PACKAGES
 try {
     $env:NUGET_PACKAGES = Join-Path $artifactsRoot (".build-packages-" + [guid]::NewGuid().ToString("N"))
-    dotnet @restoreArguments
+    dotnet restore $solutionPath --configfile $restoreConfig --no-cache
     if ($LASTEXITCODE -ne 0) { throw "Solution restore failed." }
     dotnet build $solutionPath -c $Configuration --no-restore -p:ContinuousIntegrationBuild=true
     if ($LASTEXITCODE -ne 0) { throw "Solution build failed." }
@@ -85,19 +90,6 @@ Set-Content (Join-Path $packageCachePath "$packageCacheId.$PackageVersion.nupkg.
     source = (Resolve-Path $packageOutput).Path
 } | ConvertTo-Json | Set-Content (Join-Path $packageCachePath ".nupkg.metadata") -Encoding UTF8
 
-if (-not [string]::IsNullOrWhiteSpace($RailwayDependencyFeed)) {
-    $dependencyId = "pinguapps.aspire.hosting.railway"
-    $dependencyFile = Join-Path $RailwayDependencyFeed "PinguApps.Aspire.Hosting.Railway.1.0.0.nupkg"
-    $dependencyCache = Join-Path $nugetPackages "$dependencyId/1.0.0"
-    New-Item $dependencyCache -ItemType Directory -Force | Out-Null
-    [IO.Compression.ZipFile]::ExtractToDirectory($dependencyFile, $dependencyCache)
-    Copy-Item -LiteralPath $dependencyFile -Destination (Join-Path $dependencyCache "$dependencyId.1.0.0.nupkg")
-    $dependencyHash = [Convert]::ToBase64String([Security.Cryptography.SHA512]::HashData([IO.File]::ReadAllBytes($dependencyFile)))
-    Set-Content (Join-Path $dependencyCache "$dependencyId.1.0.0.nupkg.sha512") $dependencyHash -Encoding ASCII
-    [ordered]@{version = 2; contentHash = $dependencyHash; source = $RailwayDependencyFeed} | ConvertTo-Json |
-        Set-Content (Join-Path $dependencyCache ".nupkg.metadata") -Encoding UTF8
-}
-
 Copy-Item $fixtureSource $fixtureWork -Recurse
 Remove-ContainedDirectory -Path (Join-Path $fixtureWork ".aspire") -Root $artifactsRoot
 Remove-ContainedDirectory -Path (Join-Path $fixtureWork ".modules") -Root $artifactsRoot
@@ -108,19 +100,20 @@ $aspireConfig = Get-Content $aspireConfigPath -Raw | ConvertFrom-Json
 $aspireConfig.packages.$packageId = $PackageVersion
 $aspireConfig | ConvertTo-Json -Depth 10 | Set-Content $aspireConfigPath -Encoding UTF8
 
-$packageOutputFullPath = (Resolve-Path $packageOutput).Path
+$packageOutputFullPath = [Security.SecurityElement]::Escape((Resolve-Path $packageOutput).Path)
 @"
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
   <packageSources>
     <clear />
+    $coreSource
     <add key="local-package-gate" value="$packageOutputFullPath" />
     <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
   </packageSources>
   <packageSourceMapping>
+    $coreMapping
     <packageSource key="local-package-gate">
       <package pattern="PinguApps.Aspire.Hosting.RabbitMQ.Railway" />
-      <package pattern="PinguApps.Aspire.Hosting.Railway" />
     </packageSource>
     <packageSource key="nuget.org">
       <package pattern="*" />
@@ -145,8 +138,9 @@ try {
     $deploymentSteps = aspire deploy --non-interactive --list-steps
     if ($LASTEXITCODE -ne 0) { throw "Aspire deployment pipeline inspection failed." }
     $deploymentSteps | Write-Output
-    if (($deploymentSteps -join "`n") -notmatch 'railway-deploy-rabbitmq-management') {
-        throw "The NuGet-backed fixture did not register the broker management deployment."
+    $plan = $deploymentSteps -join "`n"
+    if ($plan -notmatch 'railway-deploy-rabbitmq-management\r?\n[^\r\n]*Depends on:[^\r\n]*railway-deploy-rabbitmq(?:[,\s]|$)') {
+        throw "The NuGet-backed fixture did not order the management proxy after the broker."
     }
 }
 finally {

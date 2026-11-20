@@ -36,7 +36,7 @@ jobs:
 
       - name: Setup Aspire CLI
         run: |
-          dotnet tool install -g Aspire.Cli --version 13.6.5
+          dotnet tool install -g Aspire.Cli --version 17.0.0
           echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"
 
       - name: Resolve package version
@@ -53,7 +53,7 @@ jobs:
 
       - name: Validate NuGet-backed TypeScript AppHost fixture
         shell: pwsh
-        run: ./eng/Validate-TypeScriptAppHostPackage.ps1 -PackageVersion "${{ env.PACKAGE_VERSION }}"
+        run: ./eng/Validate-TypeScriptAppHostPackage.ps1 -PackageVersion "${{ env.PACKAGE_VERSION }}" -RequirePublishedDependency
 
       - name: Upload package artifacts
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7

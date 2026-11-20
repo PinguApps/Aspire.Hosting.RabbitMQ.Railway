@@ -78,13 +78,12 @@ jobs:
 
       - name: Setup Aspire CLI
         run: |
-          dotnet tool install -g Aspire.Cli --version 13.6.5
+          dotnet tool install -g Aspire.Cli --version 17.0.0
           echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"
 
       - name: Restore solution
         shell: pwsh
         run: |
-          ./eng/Prepare-RailwayDependency.ps1
           dotnet restore Aspire.Hosting.RabbitMQ.Railway.slnx
 
       - name: Run tests
