@@ -85,13 +85,8 @@
   ],
   "packageRules": [
     {
-      "matchPackageNames": [
-        "Aspire.Cli",
-        "Aspire.Hosting",
-        "Aspire.Hosting.RabbitMQ"
-      ],
-      "groupName": "aspire monorepo",
-      "groupSlug": "aspire-monorepo"
+      "matchPackageNames": ["/^Aspire(?:\\.|$)/i"],
+      "enabled": false
     }
   ]
 }

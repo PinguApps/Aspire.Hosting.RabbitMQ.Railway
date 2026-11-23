@@ -11,7 +11,7 @@ dotnet add package Aspire.Hosting.RabbitMQ --version 17.0.0
 dotnet add package PinguApps.Aspire.Hosting.RabbitMQ.Railway --version 1.0.5
 ```
 
-The package depends on `PinguApps.Aspire.Hosting.Railway` 1.1.5. Use .NET 10 and Aspire CLI 17.0.0.
+The minimum supported Aspire version is 17.0.0. Consumers can use Aspire 17.0.0 or later. The examples use .NET 10 and Aspire CLI 17.0.0. The package depends on `PinguApps.Aspire.Hosting.Railway` 1.1.5 or later.
 
 ## C# AppHost
 

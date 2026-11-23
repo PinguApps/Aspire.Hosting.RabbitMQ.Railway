@@ -1,6 +1,6 @@
 # Installation
 
-Use .NET 10, Aspire CLI 17.0.0, and matching built-in integration pins:
+The package targets .NET 10 and requires Aspire 17.0.0 or later. The examples use Aspire CLI 17.0.0 with matching built-in integration versions:
 
 ```json
 {
