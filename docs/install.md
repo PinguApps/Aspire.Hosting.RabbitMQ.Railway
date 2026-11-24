@@ -6,7 +6,7 @@ The package targets .NET 10 and requires Aspire 17.0.0 or later. The examples us
 {
   "packages": {
     "Aspire.Hosting.RabbitMQ": "17.0.0",
-    "PinguApps.Aspire.Hosting.Railway": "1.1.5",
+    "PinguApps.Aspire.Hosting.Railway": "1.1.6",
     "PinguApps.Aspire.Hosting.RabbitMQ.Railway": "1.0.5"
   }
 }

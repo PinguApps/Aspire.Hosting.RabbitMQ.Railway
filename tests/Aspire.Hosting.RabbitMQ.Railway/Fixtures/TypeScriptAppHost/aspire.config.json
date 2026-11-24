@@ -10,7 +10,7 @@
   "packages": {
     "Aspire.Hosting.RabbitMQ": "17.0.0",
     "PinguApps.Aspire.Hosting.RabbitMQ.Railway": "../../../../src/Aspire.Hosting.RabbitMQ.Railway/Aspire.Hosting.RabbitMQ.Railway.csproj",
-    "PinguApps.Aspire.Hosting.Railway": "1.1.5"
+    "PinguApps.Aspire.Hosting.Railway": "1.1.6"
   },
   "Parameters": {
     "site-key": "fixture-site",
